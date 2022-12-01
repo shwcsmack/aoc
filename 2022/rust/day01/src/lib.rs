@@ -1,3 +1,9 @@
+//cargo run --bin part-1
+//cargo run --bin part-2
+//cargo watch -x check -x test
+
+
+
 pub fn process_part1(input: &str) -> String {
     let result = input
         .split("\n\n")
