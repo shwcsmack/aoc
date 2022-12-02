@@ -95,6 +95,7 @@ impl std::str::FromStr for Hand {
     }
 }
 
+#[derive(Clone, Copy)]
 struct RPSRound {
     my_hand: Hand,
     elf_hand: Hand,
@@ -114,7 +115,17 @@ impl RPSRound {
             Outcome::Lose => 0 + my_hand_score,
         }
     }
-
+    
+    fn parse_part1(str: &str) -> Result<Self, String> {
+        let parts = str.split_whitespace().map(|hand| hand.parse()).collect::<Result<Vec<Hand>, String>>()?;
+        Ok(
+            Self {
+                my_hand: parts[1],
+                elf_hand: parts[0],
+            }
+        )
+    }
+    
     fn parse_part2(str: &str) -> Result<Self, String> {
         let parts: Vec<&str> = str.split_whitespace().collect();
         let elf_hand = Hand::parse_elf_hand(parts[0])?;
@@ -126,32 +137,46 @@ impl RPSRound {
             }
         )
     }
+
+
+    fn parse_with_strategy(str: &str, strategy: &ParsingStrategy) -> Result<Self, String> {
+        match strategy {
+            ParsingStrategy::PartOne => RPSRound::parse_part1(str),
+            ParsingStrategy::PartTwo => RPSRound::parse_part2(str),
+        }
+    }
 }
 
-impl std::str::FromStr for RPSRound {
-    type Err= String;
+enum ParsingStrategy {
+    PartOne,
+    PartTwo,
+}
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parts: Vec<Hand> = s.split_whitespace().map(|hand| hand.parse().unwrap()).collect();
-        Ok(Self {
-            my_hand: parts[1],
-            elf_hand: parts[0],
-        })
+struct RPSGame {
+    rounds: Vec<RPSRound>,
+}
+
+impl RPSGame {
+    fn from_str_with_strategy(str: &str, strategy: ParsingStrategy) -> Result<Self, String> {
+        let rounds: Vec<RPSRound> = str.lines()
+        .map(|line| RPSRound::parse_with_strategy(line, &strategy))
+        .collect::<Result<Vec<RPSRound>, String>>()?;
+        Ok(Self { rounds })
     }
 
+    fn get_score(self) -> u32 {
+        self.rounds.into_iter().map(|round| round.score()).sum()
+    }
 }
 
 pub fn process_part1(input: &str) -> String {
-    let rounds: Vec<RPSRound> = input.lines().map(|line| line.parse().unwrap()).collect();
-    let scores: u32 = rounds.into_iter().map(|round| round.score()).sum();
-
-    scores.to_string()
+    let game = RPSGame::from_str_with_strategy(input, ParsingStrategy::PartOne).unwrap();
+    game.get_score().to_string()
 }
 
 pub fn process_part2(input: &str) -> String {
-    let rounds: Vec<RPSRound> = input.lines().map(|line| RPSRound::parse_part2(line).unwrap()).collect();
-    let scores: u32 = rounds.into_iter().map(|round| round.score()).sum();
-    scores.to_string()
+    let game = RPSGame::from_str_with_strategy(input, ParsingStrategy::PartTwo).unwrap();
+    game.get_score().to_string()
 }
 
 
