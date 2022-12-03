@@ -17,7 +17,12 @@ pub fn process_part2(input: &str) -> String {
 mod tests {
     use super::*;
 
-    const INPUT: &str = "";
+    const INPUT: &str = "vJrwpWtwJgWrhcsFMMfFFhFp
+    jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+    PmmdzqPrVvPwwTWBwg
+    wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+    ttgJtRGJQctTZtZT
+    CrZsJsPPZsGzwwsLwLmpwMDw";
 
     #[test]
     fn part_one() {
