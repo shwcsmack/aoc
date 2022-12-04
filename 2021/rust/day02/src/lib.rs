@@ -50,11 +50,12 @@ struct Ship {
     depth: u64,
     distance: u64,
     aim: u64,
+    scheme: ControlScheme,
 }
 
 impl Ship {
-    fn process_command_per_scheme(&mut self, command: Command, scheme: ControlScheme) {
-        match scheme {
+    fn process_command(&mut self, command: Command) {
+        match self.scheme {
             ControlScheme::A => self.process_type_a_command(command),
             ControlScheme::B => self.process_type_b_command(command),
         }
@@ -79,23 +80,20 @@ impl Ship {
         }
     }
 
-    fn run_type_a_commands(&mut self, commands: Vec<Command>) {
+    fn run_commands(&mut self, commands: Vec<Command>) {
         for command in commands {
-            self.process_command_per_scheme(command, ControlScheme::A);
+            self.process_command(command);
         }
     }
 
-    fn run_type_b_commands(&mut self, commands: Vec<Command>) {
-        for command in commands {
-            self.process_command_per_scheme(command, ControlScheme::B)
-        }
-    }
-
-    fn run_commands_per_scheme(&mut self, commands: Vec<Command>, scheme: ControlScheme) {
-        match scheme {
-            ControlScheme::A => self.run_type_a_commands(commands),
-            ControlScheme::B => self.run_type_b_commands(commands),
-        }
+    fn read_commands_from_str(&mut self, str: &str) {
+        let commands: Vec<Command> = str
+            .lines()
+            .into_iter()
+            .map(|line| line.trim())
+            .filter_map(|line| line.parse::<Command>().ok())
+            .collect();
+        self.run_commands(commands);
     }
 
     fn encode(&self) -> u64 {
@@ -103,33 +101,29 @@ impl Ship {
     }
 }
 
+#[derive(Debug)]
 enum ControlScheme {
     A,
     B,
 }
 
+impl Default for ControlScheme {
+    fn default() -> Self {
+        Self::A
+    }
+}
+
 
 pub fn process_part1(input: &str) -> String {
-    let commands: Vec<Command> = input
-        .lines()
-        .into_iter()
-        .map(|line| line.trim())
-        .filter_map(|line| line.parse::<Command>().ok())
-        .collect();
     let mut ship = Ship::default();
-    ship.run_commands_per_scheme(commands, ControlScheme::A);
+    ship.read_commands_from_str(input);
     ship.encode().to_string()
 }
 
 pub fn process_part2(input: &str) -> String {
-    let commands: Vec<Command> = input
-        .lines()
-        .into_iter()
-        .map(|line| line.trim())
-        .filter_map(|line| line.parse::<Command>().ok())
-        .collect();
     let mut ship = Ship::default();
-    ship.run_commands_per_scheme(commands, ControlScheme::B);
+    ship.scheme = ControlScheme::B;
+    ship.read_commands_from_str(input);
     ship.encode().to_string()
 }
 
