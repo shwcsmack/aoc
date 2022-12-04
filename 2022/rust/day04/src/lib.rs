@@ -75,14 +75,12 @@ pub fn process_part2(input: &str) -> String {
     input
     .lines()
     .map(|line| line.trim())
-    .inspect(|str| println!("looking at {}", str))
     .map(|line| line.split(','))
     .map(|split_iter| {
         let split: Vec<ElfRange> = split_iter.map(|range| range.parse::<ElfRange>().unwrap()).collect();
         ElfPair(split[0], split[1])
     })
     .map(|elfpair| elfpair.overlaps())
-    .inspect(|x| println!("Overlaps? {}", x))
     .filter(|bool| *bool)
     .count()
     .to_string()
