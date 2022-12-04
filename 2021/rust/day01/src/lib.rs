@@ -5,11 +5,30 @@
 
 
 pub fn process_part1(input: &str) -> String {
-    todo!();
+    input
+    .lines()
+    .collect::<Vec<&str>>()
+    .windows(2)
+    .map(|window| (window[0].trim().parse::<i32>().unwrap(), window[1].trim().parse::<i32>().unwrap()))
+    .filter(|window| window.1 > window.0)
+    .count()
+    .to_string()
 }
 
 pub fn process_part2(input: &str) -> String {
-    todo!();
+    input
+    .lines()
+    .collect::<Vec<&str>>()
+    .windows(3)
+    .map(|window| {
+        // (window[0].trim().parse::<i32>().unwrap(), window[1].trim().parse::<i32>().unwrap())
+        window.iter().map(|x| x.trim().parse::<u32>().unwrap()).collect::<Vec<u32>>().iter().sum::<u32>()
+    })
+    .collect::<Vec<u32>>()
+    .windows(2)
+    .filter(|window| window[1] > window[0])
+    .count()
+    .to_string()
 }
 
 
@@ -37,6 +56,6 @@ mod tests {
     #[test]
     fn part_two() {
         let result = process_part2(INPUT);
-        assert_eq!(result, "0")
+        assert_eq!(result, "5")
     }
 }
