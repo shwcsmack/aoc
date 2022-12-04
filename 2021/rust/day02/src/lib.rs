@@ -49,10 +49,18 @@ impl FromStr for Direction {
 struct Ship {
     depth: u64,
     distance: u64,
+    aim: u64,
 }
 
 impl Ship {
-    fn process_command(&mut self, command: Command) {
+    fn process_command_per_scheme(&mut self, command: Command, scheme: ControlScheme) {
+        match scheme {
+            ControlScheme::A => self.process_type_a_command(command),
+            ControlScheme::B => self.process_type_b_command(command),
+        }
+    }
+
+    fn process_type_a_command(&mut self, command: Command) {
         match command.direction {
             Direction::Forward => self.distance += command.magnitude,
             Direction::Up => self.depth -= command.magnitude,
@@ -60,14 +68,44 @@ impl Ship {
         }
     }
 
-    fn run_commands(&mut self, commands: Vec<Command>) {
-        for command in commands {
-            self.process_command(command);
+    fn process_type_b_command(&mut self, command: Command) {
+        match command.direction {
+            Direction::Forward => {
+                self.distance += command.magnitude;
+                self.depth += self.aim * command.magnitude; 
+            },
+            Direction::Up => self.aim -= command.magnitude,
+            Direction::Down => self.aim += command.magnitude,
         }
     }
-     fn encode(&self) -> u64 {
+
+    fn run_type_a_commands(&mut self, commands: Vec<Command>) {
+        for command in commands {
+            self.process_command_per_scheme(command, ControlScheme::A);
+        }
+    }
+
+    fn run_type_b_commands(&mut self, commands: Vec<Command>) {
+        for command in commands {
+            self.process_command_per_scheme(command, ControlScheme::B)
+        }
+    }
+
+    fn run_commands_per_scheme(&mut self, commands: Vec<Command>, scheme: ControlScheme) {
+        match scheme {
+            ControlScheme::A => self.run_type_a_commands(commands),
+            ControlScheme::B => self.run_type_b_commands(commands),
+        }
+    }
+
+    fn encode(&self) -> u64 {
         self.depth * self.distance
-     }
+    }
+}
+
+enum ControlScheme {
+    A,
+    B,
 }
 
 
@@ -79,12 +117,20 @@ pub fn process_part1(input: &str) -> String {
         .filter_map(|line| line.parse::<Command>().ok())
         .collect();
     let mut ship = Ship::default();
-    ship.run_commands(commands);
+    ship.run_commands_per_scheme(commands, ControlScheme::A);
     ship.encode().to_string()
 }
 
 pub fn process_part2(input: &str) -> String {
-    todo!();
+    let commands: Vec<Command> = input
+        .lines()
+        .into_iter()
+        .map(|line| line.trim())
+        .filter_map(|line| line.parse::<Command>().ok())
+        .collect();
+    let mut ship = Ship::default();
+    ship.run_commands_per_scheme(commands, ControlScheme::B);
+    ship.encode().to_string()
 }
 
 
@@ -105,10 +151,9 @@ mod tests {
         assert_eq!(result, "150");
     }
 
-    #[ignore]
     #[test]
     fn part_two() {
         let result = process_part2(INPUT);
-        assert_eq!(result, "0")
+        assert_eq!(result, "900")
     }
 }
