@@ -4,7 +4,7 @@
 
 use std::{str::FromStr, num::ParseIntError};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 struct ElfPair(ElfRange, ElfRange);
 
 impl ElfPair {
@@ -17,7 +17,21 @@ impl ElfPair {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+impl FromStr for ElfPair {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts = s.split(',').map(|str| str.parse().unwrap()).collect::<Vec<ElfRange>>();
+        if parts.len() == 2{
+            Ok(ElfPair(parts[0], parts[1]))
+        } else {
+            Err(format!("Not a pair: {}", s))
+        }
+
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct ElfRange {
     min: i32,
     max: i32,
@@ -60,13 +74,8 @@ pub fn process_part1(input: &str) -> String {
     input
     .lines()
     .map(|line| line.trim())
-    .map(|line| line.split(','))
-    .map(|split_iter| {
-        let split: Vec<ElfRange> = split_iter.map(|range| range.parse::<ElfRange>().unwrap()).collect();
-        ElfPair(split[0], split[1])
-    })
-    .map(|elfpair| elfpair.fully_overlaps())
-    .filter(|bool| *bool)
+    .filter_map(|line| line.parse::<ElfPair>().ok())
+    .filter(|elfpair| elfpair.fully_overlaps())
     .count()
     .to_string()
 }
@@ -75,13 +84,8 @@ pub fn process_part2(input: &str) -> String {
     input
     .lines()
     .map(|line| line.trim())
-    .map(|line| line.split(','))
-    .map(|split_iter| {
-        let split: Vec<ElfRange> = split_iter.map(|range| range.parse::<ElfRange>().unwrap()).collect();
-        ElfPair(split[0], split[1])
-    })
-    .map(|elfpair| elfpair.overlaps())
-    .filter(|bool| *bool)
+    .filter_map(|str| str.parse::<ElfPair>().ok())
+    .filter(|elfpair| elfpair.overlaps())
     .count()
     .to_string()
 }
@@ -108,5 +112,19 @@ mod tests {
     fn part_two() {
         let result = process_part2(INPUT);
         assert_eq!(result, "4")
+    }
+
+    #[test]
+    fn parse_elf_pair() {
+        let sut = ElfPair(ElfRange { min: 1, max: 5 }, ElfRange { min: 7, max: 13 });
+        let str = "1-5,7-13";
+        assert_eq!(str.parse::<ElfPair>().unwrap(), sut)
+    }
+
+    #[test]
+    fn parse_elf_range() {
+        let sut = ElfRange{ min: 1, max: 15};
+        let str = "1-15";
+        assert_eq!(str.parse::<ElfRange>().unwrap(), sut)
     }
 }
