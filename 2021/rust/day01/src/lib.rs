@@ -36,12 +36,16 @@ pub fn process_part2(input: &str) -> String {
 mod tests {
     use super::*;
 
-    const INPUT: &str = "forward 5
-    down 5
-    forward 8
-    up 3
-    down 8
-    forward 2";
+    const INPUT: &str = "199
+    200
+    208
+    210
+    200
+    207
+    240
+    269
+    260
+    263";
 
     #[test]
     fn part_one() {
@@ -49,7 +53,6 @@ mod tests {
         assert_eq!(result, "7");
     }
 
-    #[ignore]
     #[test]
     fn part_two() {
         let result = process_part2(INPUT);
