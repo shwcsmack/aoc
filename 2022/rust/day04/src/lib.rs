@@ -2,9 +2,11 @@
 //cargo run --bin part-2
 //cargo watch -x check -x test
 
-use std::{str::FromStr, num::ParseIntError};
+use std::{str::FromStr, num::ParseIntError, ops::Range};
 
-#[derive(Debug)]
+use nom::{IResult, character::{is_alphabetic, complete::alphanumeric0}};
+
+#[derive(Debug, PartialEq, Eq)]
 struct ElfPair(ElfRange, ElfRange);
 
 impl ElfPair {
@@ -17,7 +19,7 @@ impl ElfPair {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct ElfRange {
     min: i32,
     max: i32,
@@ -55,6 +57,11 @@ impl FromStr for ElfRange {
     }
 }
 
+fn elf_pair(input: &str) -> IResult<&str, Range<u32>> {
+    let (_, input) = alphanumeric0(input)?;
+  
+    Ok()
+  }
 
 pub fn process_part1(input: &str) -> String {
     input
@@ -108,5 +115,12 @@ mod tests {
     fn part_two() {
         let result = process_part2(INPUT);
         assert_eq!(result, "4")
+    }
+
+    #[test]
+    fn parse_elf_pair() {
+        let sut = ElfPair(ElfRange { min: 1, max: 4 }, ElfRange { min: 7, max: 11 });
+        let result = elf_pair("     1-4,7-11    \n").unwrap().1;
+        assert_eq!(sut, result);        
     }
 }
