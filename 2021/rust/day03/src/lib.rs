@@ -1,11 +1,13 @@
 //cargo run --bin part-1
 //cargo run --bin part-2
 //cargo watch -x check -x test
+mod matrix;
 
-
+use matrix::Matrix;
 
 pub fn process_part1(input: &str) -> String {
-    todo!();
+    let matrix = input.parse::<Matrix>().unwrap();
+    matrix.power_consumption().to_string()
 }
 
 pub fn process_part2(input: &str) -> String {
@@ -33,7 +35,7 @@ mod tests {
     #[test]
     fn part_one() {
         let result = process_part1(INPUT);
-        assert_eq!(result, "0");
+        assert_eq!(result, "198");
     }
 
     #[ignore]
