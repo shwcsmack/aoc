@@ -2,9 +2,6 @@
 //cargo run --bin part-2
 //cargo watch -x check -x test
 
-use std::collections::VecDeque;
-
-
 fn has_duplicates(chars_in: &[char]) -> bool {
     let mut chars_to_check = chars_in.clone().to_vec();
     let mut output = false;
@@ -17,7 +14,7 @@ fn has_duplicates(chars_in: &[char]) -> bool {
 }
 
 pub fn process_part1(input: &str) -> String {
-    let mut chars: Vec<char> = input.chars().collect();
+    let chars: Vec<char> = input.chars().collect();
 
     let pre_marker_windows: Vec<&[char]> = chars.windows(4).take_while(|window| has_duplicates(window)).collect();
 
@@ -25,7 +22,7 @@ pub fn process_part1(input: &str) -> String {
 }
 
 pub fn process_part2(input: &str) -> String {
-    let mut chars: Vec<char> = input.chars().collect();
+    let chars: Vec<char> = input.chars().collect();
 
     let pre_marker_windows: Vec<&[char]> = chars.windows(14).take_while(|window| has_duplicates(window)).collect();
 
