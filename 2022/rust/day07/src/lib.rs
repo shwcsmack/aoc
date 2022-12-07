@@ -41,7 +41,7 @@ mod tests {
     #[test]
     fn part_one() {
         let result = process_part1(INPUT);
-        assert_eq!(result, "0");
+        assert_eq!(result, "95437");
     }
 
     #[ignore]
